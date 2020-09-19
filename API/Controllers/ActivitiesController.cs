@@ -9,11 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class ActivitiesController : BaseController
     {  
-
+  
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> List()
         {
@@ -21,7 +19,6 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<ActionResult<Activity>> Details(Guid id)
         {
             return await Mediator.Send(new Details.Query { Id = id });
