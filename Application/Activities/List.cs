@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Errors;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -13,26 +14,29 @@ namespace Application.Activities
     public class List
     {
         //To Query the data and get the list of activities
-        public class Query : IRequest<List<Activity>> { }
+        public class Query : IRequest<List<ActivityDto>> { }
 
         //To handle the request coming from the api adding constructor will make the api more thin and uses only http requests in and out.
-        public class Handler : IRequestHandler<Query, List<Activity>>
+        public class Handler : IRequestHandler<Query, List<ActivityDto>>
         {
             private readonly DataContext _context;
-            public Handler(DataContext context)
+            private readonly IMapper _mapper;
+            public Handler(DataContext context, IMapper mapper)
             {
-                this._context = context;
+                _mapper = mapper;
+                _context = context;
 
             }
 
-            public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var activities = await _context.Activities.ToListAsync();
+                var activities = await _context.Activities
+                .ToListAsync();
 
-                  if (activities == null)
-                    throw new RestException(HttpStatusCode.NotFound,new {activity ="Not Found records"});
+                if (activities == null)
+                    throw new RestException(HttpStatusCode.NotFound, new { activity = "Not Found records" });
 
-                return activities;
+                return _mapper.Map<List<Activity>,List<ActivityDto>>(activities);
             }
         }
 

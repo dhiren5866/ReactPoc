@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using API.MiddleWare;
 using Application.Activities;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using FluentValidation.AspNetCore;
 using Infrastructure.Security;
@@ -43,6 +44,7 @@ namespace API
         {
             services.AddDbContext<DataContext>(options =>
             {
+                options.UseLazyLoadingProxies();
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddCors(options =>
@@ -54,7 +56,9 @@ namespace API
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
-            services.AddControllers(opt => {
+            services.AddAutoMapper(typeof(List.Handler));
+            services.AddControllers(opt =>
+            {
                 var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                 opt.Filters.Add(new AuthorizeFilter(policy));
             })
@@ -67,6 +71,16 @@ namespace API
             var identitybuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identitybuilder.AddEntityFrameworkStores<DataContext>();
             identitybuilder.AddSignInManager<SignInManager<AppUser>>();
+
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("IsActivityHost", policy =>
+                {
+                    policy.Requirements.Add(new IsHostRequirement());
+                });
+            });
+
+            services.AddTransient<IAuthorizationHandler, IsHostRequirementHandler>();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]));
 
@@ -85,7 +99,7 @@ namespace API
             );
 
             services.AddScoped<IJwtGenerator, JwtGenerator>();
-            services.AddScoped<IUserAccessor,UserAccessor>();
+            services.AddScoped<IUserAccessor, UserAccessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
