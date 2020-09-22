@@ -72,7 +72,7 @@ namespace Application.Activities
                     IsHost = true
                 };
 
-                _context.UserActivities.Add(attendee);
+                _context.UserActivity.Add(attendee);
 
                 var success = await _context.SaveChangesAsync() > 0;
 

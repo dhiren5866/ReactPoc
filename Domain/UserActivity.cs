@@ -10,7 +10,7 @@ namespace Domain
 
         public Guid ActivityId { get; set; }
 
-        public Activity Activity { get; set; }
+        public virtual Activity Activity { get; set; }
 
         public DateTime DateJoined { get; set; }
 

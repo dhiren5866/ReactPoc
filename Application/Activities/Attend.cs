@@ -37,12 +37,12 @@ namespace Application.Activities
                 var user = await _context.Users.SingleOrDefaultAsync(x =>
                         x.UserName == _userAccessor.GetCurrentUserName());
 
-                var attendance = await _context.UserActivities
+                var attendance = await _context.UserActivity
                     .SingleOrDefaultAsync(x => x.ActivityId == activity.Id && x.AppUserId == user.Id);
 
 
                 if (attendance != null)
-                    throw new RestException(HttpStatusCode.BadGateway, new { Attendance = "Already attending the activity" });
+                    throw new RestException(HttpStatusCode.BadRequest, new { Attendance = "Already attending the activity" });
 
                 attendance = new Domain.UserActivity
                 {
@@ -51,7 +51,7 @@ namespace Application.Activities
                     IsHost = false,
                     DateJoined = DateTime.Now
                 };
-                _context.UserActivities.Add(attendance);
+                _context.UserActivity.Add(attendance);
 
                 var success = await _context.SaveChangesAsync() > 0;
 

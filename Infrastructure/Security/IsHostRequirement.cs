@@ -39,7 +39,7 @@ namespace Infrastructure.Security
 
                 var activity = _context.Activities.FindAsync(activityId).Result;
 
-                var host = activity.UserActivities.FirstOrDefault(x => x.IsHost);
+                var host = activity.UserActivity.FirstOrDefault(x => x.IsHost);
 
 
                 if (host?.AppUser?.UserName == currentUserName)
