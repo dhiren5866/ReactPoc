@@ -23,7 +23,7 @@ export const createAttendee = (user: IUser): IAttendee => {
         displayName: user.displayName,
         isHost: false,
         username: user.userName,
-        image: user.Image!
+        image: user.image!
 
     }
 }
